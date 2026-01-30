@@ -30,12 +30,10 @@ jobs:
       - name: Build md Index
         run: python .github/workflows/build_index.py
 
-      # Copy site into PR folder if this is a pull request
-      - name: Prepare PR folder
-        if: github.event_name == 'pull_request'
-        run: |
-          mkdir -p pr-${{ github.event.number }}
-          cp -r * pr-${{ github.event.number }}/
+      - name: Create PR dir
+          if: github.event_name == 'pull_request'
+          run: |
+            cp -r !(pr-*) "pr-${{ github.event.number }}"
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
