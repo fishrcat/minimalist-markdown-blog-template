@@ -30,15 +30,22 @@ jobs:
       - name: Build md Index
         run: python .github/workflows/build_index.py
 
-      - name: Create PR dir
-          if: github.event_name == 'pull_request'
-          run: |
-            cp -r !(pr-*) "pr-${{ github.event.number }}"
+      - name: Build site folder
+        run: |
+          mkdir -p build
+          cp index.html favicon.ico config.json LICENSE build/
+          cp -r content build/
+
+      - name: Prepare PR folder
+        if: github.event_name == 'pull_request'
+        run: cp -r build "pr-${{ github.event.number }}"
+
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ github.event_name == 'pull_request' && 'pr-' || '.' }}${{ github.event_name == 'pull_request' && github.event.number || '' }}
+          path: ${{ github.event_name == 'pull_request' && 'pr-' + github.event.number || 'build' }}
+
 
       - name: Deploy Pages
         id: deployment
