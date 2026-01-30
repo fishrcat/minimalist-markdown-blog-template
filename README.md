@@ -16,9 +16,11 @@ Select `Use This Template` in GitHub:
 
 ![Use This Template location](content/img/use-template.png)
 
-### 2) Confirm the GitHub Pages site deployment
+### 2) Configure the GitHub Pages site deployment
 
-Wait for the *Build and Deploy Pages Site* GiHub Action to finish running on the initial repo commit.  This workflow indexes all available post files and deploys the site.
+In the repo **Settings** > **Pages** > **Build and Deployment**, set **Source** to *GitHub Actions*.
+
+Rerun the **Build and Deploy Pages Site** GiHub Action on the initial repo commit.  This workflow indexes all available post files and deploys the site.
 
 The *Report Pages URL* step at the end of the workflow will provide a direct link to the deployed site.  
 
@@ -34,7 +36,7 @@ Update following sections in `config.json`, commit the file to a new branch, and
 **Content**
 
 * `meta` - Site title and info section displayed at the top of the page
-* `postColumns` - Any number of column titles to house the posts from the associated directories.  
+* `postColumns` - Any number of column titles to house the posts from the associated directories.  Posts will appear in the columns in commit timestamp order with the most recent at the top.
 
 **Style** 
 
@@ -52,7 +54,7 @@ When you are happy with the style, merge the PR to main to deploy the update to 
 
 ## Posting
 
-To add a new post, commit the file to the relevant `/content` column sub directory on a branch and open a new PR.  Posts will appear in columns in edit timestamp order with the most recent at the top.
+To add a new post, commit the file to the relevant `/content` column sub directory on a branch and open a new PR.
 
 To preview the updated site, follow the link in the *Report Pages URL* step at the end of the *Build and Deploy Pages Site* GiHub Action workflow.
 
