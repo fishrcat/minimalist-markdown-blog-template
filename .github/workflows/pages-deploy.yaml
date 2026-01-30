@@ -1,0 +1,54 @@
+name: Build and Deploy Pages Site
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  pages: write
+
+concurrency:
+  group: pages-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build md Index
+        run: |
+          python <<'PY'
+          import json
+          from pathlib import Path
+
+          cfg = json.loads(Path("config.json").read_text())
+          for c in cfg["postColumns"]:
+              d = Path(c["dir"])
+              if d.is_dir():
+                  (d / "index.json").write_text(
+                      json.dumps(sorted(p.name for p in d.glob("*.md")), indent=2)
+                  )
+          PY
+
+      - name: Upload Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Report Pages URL
+        run: echo "Pages URL: ${{ steps.deployment.outputs.page_url }}"

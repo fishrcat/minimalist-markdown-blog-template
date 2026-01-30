@@ -1,0 +1,25 @@
+{
+  "meta": {
+    "siteTitle": "My Tech Blog",
+    "introText": "Explorations of ideas, systems, and implementation details. Each post is a single markdown file loaded dynamically. This intro, site colors, and column configuration loaded from config."
+  },
+  "footer": {
+    "githubUrl": "https://github.com/fishrcat/minimalist-markdown-blog-template",
+    "aboutUrl": "https://example.com/about"
+  },
+  "colors": {
+    "primary": "#50E3C2",
+    "secondary": "#BD10E0",
+    "text": "#1a202c",
+    "bg": "#F5F5F5"
+  },
+  "font": {
+    "url": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap",
+    "family": "'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif"
+  },
+  "postColumns": [
+    { "title": "Tutorials", "dir": "content/tutorials" },
+    { "title": "Dev Logs", "dir": "content/dev-logs" },
+    { "title": "Ideas", "dir": "content/ideas" }
+  ]
+}
