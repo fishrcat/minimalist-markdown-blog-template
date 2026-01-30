@@ -44,6 +44,7 @@ jobs:
             echo "ARTIFACT_PATH=$PR_DIR" >> $GITHUB_ENV
           else
             echo "ARTIFACT_PATH=build" >> $GITHUB_ENV
+          fi
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
