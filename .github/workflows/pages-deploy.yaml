@@ -33,18 +33,22 @@ jobs:
       - name: Build site folder
         run: |
           mkdir -p build
-          cp index.html favicon.ico config.json LICENSE build/
+          cp index.html favicon.ico config.json LICENSE README.md build/
           cp -r content build/
 
-      - name: Prepare PR folder
-        if: github.event_name == 'pull_request'
-        run: cp -r build "pr-${{ github.event.number }}"
-
+      - name: Prepare artifact folder
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            PR_DIR="pr-${GITHUB_EVENT_NUMBER}"
+            cp -r build "$PR_DIR"
+            echo "ARTIFACT_PATH=$PR_DIR" >> $GITHUB_ENV
+          else
+            echo "ARTIFACT_PATH=build" >> $GITHUB_ENV
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ github.event_name == 'pull_request' && format('pr-%d', github.event.number) || 'build' }}
+          path: ${{ env.ARTIFACT_PATH }}
 
       - name: Deploy Pages
         id: deployment
