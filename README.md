@@ -36,7 +36,7 @@ Update following sections in `config.json`, commit the file to a new branch, and
 **Content**
 
 * `meta` - Site title and info section displayed at the top of the page
-* `postColumns` - Any number of column titles to house the posts from the associated directories.  Posts will appear in the columns in commit timestamp order with the most recent at the top.
+* `postColumns` - Any number of column titles to house the posts from the associated directories.  Posts will appear in the columns in commit timestamp order.
 
 **Style** 
 
