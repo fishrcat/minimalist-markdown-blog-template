@@ -44,8 +44,7 @@ jobs:
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ github.event_name == 'pull_request' && 'pr-' + github.event.number || 'build' }}
-
+          path: ${{ github.event_name == 'pull_request' && format('pr-%d', github.event.number) || 'build' }}
 
       - name: Deploy Pages
         id: deployment
