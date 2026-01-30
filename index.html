@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <title>Loading…</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  />
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+    }
+
+    #container {
+      width: 90%;
+      max-width: 900px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 28px 0 16px;
+      text-align: center;
+      font-size: 2.2rem;
+      font-weight: 700;
+      border-bottom: 3px solid var(--primary);
+    }
+
+    section {
+      margin: 24px 0;
+    }
+
+    #intro {
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    #posts {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .post-column {
+      flex: 1 1 30%;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .post-column h3 {
+      text-align: center;
+      color: var(--secondary);
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+
+    .post-cards-container {
+      max-height: 300px;
+      overflow-y: hidden;
+      padding-right: 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .post-cards-container:hover {
+      overflow-y: auto;
+    }
+
+    @media (max-width: 700px) {
+    .post-cards-container {
+      overflow-y: auto;
+    }
+}
+
+    .post-card {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .post-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      border-left: 4px solid var(--primary);
+    }
+
+    .post-card.active {
+      border-left: 4px solid var(--secondary);
+    }
+
+    #content {
+      background: white;
+      padding: 28px;
+      border-radius: 8px;
+      min-height: 240px;
+      line-height: 1.7;
+      margin-top: 24px;
+    }
+
+    #content a {
+      color: var(--secondary);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    #content hr {
+      border: none;
+      height: 2px;
+      background: var(--primary);
+      margin: 1.5em 0;
+    }
+
+    footer {
+      margin-top: auto;
+      padding: 24px 0;
+      text-align: center;
+      border-top: 1px solid #ddd;
+      font-size: 0;
+    }
+
+    footer a {
+      font-size: 1.4rem;
+      color: var(--text);
+      margin: 0 8px;
+      display: inline-block;
+      transition: color 0.2s;
+    }
+
+    @media (max-width: 700px) {
+      #posts {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <header id="siteTitle"></header>
+
+    <section id="intro">
+      <p id="introText"></p>
+    </section>
+
+    <section id="posts"></section>
+
+    <section id="content">
+      <em>Select a post to read.</em>
+    </section>
+
+    <footer></footer>
+  </div>
+
+  <script type="module">
+    const $ = id => document.getElementById(id);
+
+    const els = {
+      content: $("content"),
+      posts: $("posts"),
+      footer: document.querySelector("footer"),
+      title: $("siteTitle"),
+      intro: $("introText")
+    };
+
+    const fetchJSON = async url => {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Failed to load ${url}`);
+      return r.json();
+    };
+
+    const fetchText = async url => {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Failed to load ${url}`);
+      return r.text();
+    };
+
+    const setTheme = colors =>
+      Object.entries(colors).forEach(([k, v]) =>
+        document.documentElement.style.setProperty(`--${k}`, v)
+      );
+
+    const setFont = font => {
+      if (font?.url) {
+        const l = document.createElement("link");
+        l.rel = "stylesheet";
+        l.href = font.url;
+        document.head.appendChild(l);
+      }
+      if (font?.family) {
+        document.documentElement.style.setProperty("--font", font.family);
+      }
+    };
+
+    const renderFooter = cfg => {
+      const repo = cfg.footer.githubUrl;
+      els.footer.innerHTML = `
+        <a href="${repo}/blob/main/LICENSE" target="_blank" aria-label="License">
+          <i class="fa-regular fa-copyright"></i>
+        </a>
+        <a href="${repo}" target="_blank" aria-label="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="${cfg.footer.aboutUrl}" target="_blank" aria-label="About">
+          <i class="fa-regular fa-user"></i>
+        </a>
+      `;
+    };
+
+    const createCard = (name, url) => {
+      const el = document.createElement("div");
+      el.className = "post-card";
+      el.textContent = name.replace(/\.md$/, "").replace(/-/g, " ");
+
+      el.addEventListener("click", async () => {
+        document.querySelectorAll(".post-card.active")
+          .forEach(c => c.classList.remove("active"));
+
+        el.classList.add("active");
+        els.content.innerHTML = "<em>Loading…</em>";
+
+        try {
+          els.content.innerHTML = marked.parse(await fetchText(url));
+          el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        } catch {
+          els.content.innerHTML = "<em>Failed to load post.</em>";
+        }
+      });
+
+      return el;
+    };
+
+    const loadPosts = async (container, dir) => {
+      try {
+        const files = await fetchJSON(`${dir}/index.json`);
+        container.replaceChildren(
+          ...files.map(f => createCard(f, `${dir}/${f}`))
+        );
+      } catch {
+        container.textContent = "Failed to load posts.";
+      }
+    };
+
+    const renderColumns = cfg =>
+      cfg.postColumns.forEach(col => {
+        const column = document.createElement("div");
+        column.className = "post-column";
+
+        const h = document.createElement("h3");
+        h.textContent = col.title;
+
+        const cards = document.createElement("div");
+        cards.className = "post-cards-container";
+
+        column.append(h, cards);
+        els.posts.appendChild(column);
+
+        loadPosts(cards, col.dir);
+      });
+
+    async function init() {
+      try {
+        const cfg = await fetchJSON("./config.json");
+
+        els.title.textContent = cfg.meta.siteTitle;
+        document.title = cfg.meta.siteTitle;
+        els.intro.textContent = cfg.meta.introText;
+
+        setTheme(cfg.colors);
+        setFont(cfg.font);
+        renderFooter(cfg);
+        renderColumns(cfg);
+
+      } catch (e) {
+        els.content.innerHTML = "<strong>Site failed to initialize.</strong>";
+        console.error(e);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
