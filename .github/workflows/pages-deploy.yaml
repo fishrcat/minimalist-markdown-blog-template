@@ -17,6 +17,7 @@ concurrency:
 jobs:
   build_and_deploy:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'github-pages' || 'pages-preview' }}
 
     steps:
       - uses: actions/checkout@v4
@@ -30,33 +31,12 @@ jobs:
       - name: Build md Index
         run: python .github/workflows/build_index.py
 
-      - name: Build site folder
-        run: |
-          mkdir -p build
-          cp index.html favicon.ico config.json LICENSE README.md build/
-          cp -r content build/
-
-      - name: Prepare artifact folder
-        run: |
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
-            PR_DIR="pr-${GITHUB_EVENT_NUMBER}"
-            cp -r build "$PR_DIR"
-            echo "ARTIFACT_PATH=$PR_DIR" >> $GITHUB_ENV
-          else
-            echo "ARTIFACT_PATH=build" >> $GITHUB_ENV
-          fi
-
-      - name: Upload Pages
+      - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v3
-        with:
-          path: ${{ env.ARTIFACT_PATH }}
 
       - name: Deploy Pages
         id: deployment
         uses: actions/deploy-pages@v4
 
       - name: Report Pages URL
-        run: |
-          URL="${{ steps.deployment.outputs.page_url }}"
-          [ "${GITHUB_EVENT_NAME}" = "pull_request" ] && URL="$URL/pr-${{ github.event.number }}/"
-          echo "Pages URL - $URL"
+        run: echo "Pages URL: ${{ steps.deployment.outputs.page_url }}"
