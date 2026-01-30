@@ -52,7 +52,7 @@ When you are happy with the style, merge the PR to main to deploy the update to 
 
 ## Posting
 
-To add a new post, commit the file to the relevant `/content` sub directory on a branch and open a new PR.
+To add a new post, commit the file to the relevant `/content` column sub directory on a branch and open a new PR.  Posts will appear in columns in edit timestamp order with the most recent at the top.
 
 To preview the updated site, follow the link in the *Report Pages URL* step at the end of the *Build and Deploy Pages Site* GiHub Action workflow.
 
@@ -61,3 +61,9 @@ Merge the PR to main to deploy the update to the main site.
 ## Modding
 
 All HTML, CSS, and JS are inlined in `index.html` in simplest form.
+
+To create the required indices and run the site locally, run:
+
+    python3 .github/workflows/build_index.py
+
+    python3 -m http.server 8000
