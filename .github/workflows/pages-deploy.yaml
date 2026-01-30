@@ -29,10 +29,8 @@ jobs:
 
       - name: Build md Index
         run: |
-          python <<'PY'
           import json
           from pathlib import Path
-
           cfg = json.loads(Path("config.json").read_text())
           for c in cfg["postColumns"]:
               d = Path(c["dir"])
@@ -40,7 +38,7 @@ jobs:
                   (d / "index.json").write_text(
                       json.dumps(sorted(p.name for p in d.glob("*.md")), indent=2)
                   )
-          PY
+        shell: python
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
