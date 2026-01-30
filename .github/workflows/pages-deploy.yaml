@@ -32,7 +32,6 @@ jobs:
 
       - name: Build md Index
         run: python .github/workflows/build_index.py
-        shell: python
 
       - name: Upload Pages
         uses: actions/upload-pages-artifact@v3
