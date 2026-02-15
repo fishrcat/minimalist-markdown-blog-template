@@ -6,6 +6,8 @@ Single-page, no maintenance blog site
 
 &rarr; Style via config file.
 
+&rarr; Utilizes Oat, an ultra-lightweight HTML + CSS UI component library.
+
 ![Example default blog image](content/img/default-blog.png)
 
 ## Setup Guide
